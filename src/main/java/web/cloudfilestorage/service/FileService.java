@@ -35,6 +35,10 @@ public class FileService{
         this.userRepository = userRepository;
     }
 
+    public List<File> findAllFiles() {
+        return fileRepository.findAll();
+    }
+
     public File fileById (long id) throws EntityNotFoundException {
         Optional<File> file =  fileRepository.findFileById(id);
         if (file.isEmpty()) {

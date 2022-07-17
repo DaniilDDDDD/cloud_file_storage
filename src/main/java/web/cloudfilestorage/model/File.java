@@ -21,7 +21,7 @@ public class File implements Serializable {
 
     @Setter(AccessLevel.NONE)
     @Column(name = "upload_date")
-    private LocalDateTime upload_date;
+    private LocalDateTime uploadDate;
 
     @Column(name = "description")
     private String description;
@@ -42,7 +42,7 @@ public class File implements Serializable {
         this.file = file;
         this.description = description;
         this.owner = owner;
-        this.upload_date = LocalDateTime.now();
+        this.uploadDate = LocalDateTime.now();
     }
 
     public File() {

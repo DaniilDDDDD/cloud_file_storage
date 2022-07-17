@@ -1,6 +1,8 @@
 package web.cloudfilestorage.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/files")
+@Tag(name = "File", description = "Files' operations")
 public class FileController {
 
     private final UserService userService;
@@ -43,6 +46,10 @@ public class FileController {
     }
 
     @GetMapping("")
+    @Operation(
+            summary = "List files",
+            description = "List authenticated user's files"
+    )
     public ResponseEntity<List<File>> list(
             Authentication authentication
     ) throws JwtAuthenticationException {
@@ -58,6 +65,10 @@ public class FileController {
     }
 
     @PostMapping("")
+    @Operation(
+            summary = "Create file",
+            description = "Create file owned by an authorized user"
+    )
     public ResponseEntity<File> create(
             @RequestParam(value = "file")
                     MultipartFile multipartFile,
@@ -84,10 +95,14 @@ public class FileController {
     }
 
     @PutMapping("/{id}")
+    @Operation(
+            summary = "Update file",
+            description = "Update file owned by an authorized user"
+    )
     public ResponseEntity<File> update (
             @PathVariable(value = "id")
             @NotNull(message = "id must be provided as path variable")
-            @Min(value = 0, message = "minimal value for id is 0")
+            @Min(value = 1, message = "minimal value for id is 1")
                     Long id,
             @RequestParam(value = "file")
                     MultipartFile multipartFile,
@@ -124,10 +139,14 @@ public class FileController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(
+            summary = "Delete file",
+            description = "Delete file owned by an authorized user"
+    )
     public ResponseEntity<String> delete (
             @PathVariable(value = "id")
             @NotNull(message = "id must be provided as path variable")
-            @Min(value = 0, message = "minimal value for id is 0")
+            @Min(value = 1, message = "minimal value for id is 1")
                     Long id,
             Authentication authentication
     )

@@ -73,7 +73,7 @@ public class ErrorHandlerControllerAdvice {
             Exception e
     ) {
         final Violation violation = new Violation(
-                "",
+                "Authorization",
                 e.getMessage()
         );
         return new ValidationErrorResponse(violation);

@@ -2,6 +2,8 @@ package web.cloudfilestorage.controller;
 
 
 import io.jsonwebtoken.JwtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "User", description = "Users' operations")
 public class UserController {
 
     private final UserService userService;
@@ -44,6 +47,10 @@ public class UserController {
     }
 
     @PostMapping("/register")
+    @Operation(
+            summary = "Register",
+            description = "Register user"
+    )
     public ResponseEntity<User> register(
             @Valid @RequestBody UserRegister userRegister
     ) throws EntityExistsException {
@@ -51,6 +58,10 @@ public class UserController {
     }
 
     @PostMapping("/login")
+    @Operation(
+            summary = "Login",
+            description = "Login user"
+    )
     public ResponseEntity<UserLogin> login(
             @Validated({UserLogin.OnRequest.class})
             @RequestBody
@@ -78,6 +89,10 @@ public class UserController {
     }
 
     @GetMapping("")
+    @Operation(
+            summary = "Retrieve file",
+            description = "Retrieve information about authenticated user"
+    )
     public ResponseEntity<User> retrieve(
             Authentication authentication
     ) throws JwtAuthenticationException {
@@ -91,6 +106,10 @@ public class UserController {
     }
 
     @PutMapping("")
+    @Operation(
+            summary = "Update user",
+            description = "Update information about authenticated user"
+    )
     public ResponseEntity<User> update(
             @Valid @RequestBody UserUpdate userUpdate,
             Authentication authentication
@@ -108,6 +127,10 @@ public class UserController {
     }
 
     @DeleteMapping("")
+    @Operation(
+            summary = "Delete user",
+            description = "Delete authenticated user"
+    )
     public ResponseEntity<String> delete(
             Authentication authentication
     ) throws JwtAuthenticationException {

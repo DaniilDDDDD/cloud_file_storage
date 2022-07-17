@@ -20,6 +20,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+// TODO: change updating User Entities - remove calling of setters from service (check if it's good solution)
 @Service
 public class UserService implements UserDetailsService {
 
@@ -126,15 +127,27 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long id) throws EntityNotFoundException {
+
+        Optional<User> user = userRepository.findUserById(id);
+        if (user.isEmpty()) {
+            throw new EntityNotFoundException(
+                    "User with id " + id + " is not present in database!"
+            );
+        }
         userRepository.deleteById(id);
     }
 
     @Transactional
     public void delete(String username) throws EntityNotFoundException {
-        userRepository.deleteByUsername(username);
+        Optional<User> user = userRepository.findUserByUsername(username);
+        if (user.isEmpty()) {
+            throw new EntityNotFoundException(
+                    "User with username " + username + " is not present in database!"
+            );
+        }
+        userRepository.deleteUserByUsername(username);
     }
-
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
