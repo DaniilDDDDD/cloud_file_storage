@@ -1,11 +1,13 @@
 package web.cloudfilestorage.dto.user;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
+@Builder
 public class UserRegister {
 
     @NotNull(message = "username field is not provided")

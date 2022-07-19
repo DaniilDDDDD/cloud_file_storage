@@ -29,7 +29,7 @@ public class FileUtil {
         }
     }
 
-    public static void updateFile (
+    public static void updateFile(
             String currentPathToFile,
             String newFileName,
             MultipartFile multipartFile
@@ -52,13 +52,13 @@ public class FileUtil {
         }
     }
 
-    public static void deleteFile (
+    public static void deleteFile(
             String filename
     ) throws IOException {
         Path path = Paths.get(filename);
         Files.deleteIfExists(path);
 
-         if (Files.list(path.getParent()).findAny().isEmpty()) {
+        if (Files.list(path.getParent()).findAny().isEmpty()) {
             Files.delete(path.getParent());
         }
     }

@@ -1,9 +1,11 @@
 package web.cloudfilestorage.dto.role;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class RoleUpdate {
+@Builder
+public class RoleData {
 
     private String name;
 

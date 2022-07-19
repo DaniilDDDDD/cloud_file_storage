@@ -54,7 +54,10 @@ public class UserController {
     public ResponseEntity<User> register(
             @Valid @RequestBody UserRegister userRegister
     ) throws EntityExistsException {
-        return new ResponseEntity<>(userService.register(userRegister), HttpStatus.CREATED);
+        return new ResponseEntity<>(
+                userService.create(userRegister),
+                HttpStatus.CREATED
+        );
     }
 
     @PostMapping("/login")
@@ -77,9 +80,14 @@ public class UserController {
                         userLogin.getPassword()
                 )
         );
-        UserDetails user = userService.loadUserByUsername(userLogin.getLogin());
+        UserDetails user = userService.loadUserByUsername(
+                userLogin.getLogin()
+        );
 
-        String token = jwtTokenProvider.createToken(userLogin.getLogin(), user.getAuthorities());
+        String token = jwtTokenProvider.createToken(
+                userLogin.getLogin(),
+                user.getAuthorities()
+        );
 
         UserLogin response = UserLogin.builder()
                 .login(userLogin.getLogin()).token(token)
@@ -99,9 +107,8 @@ public class UserController {
         if (authentication == null) {
             throw new JwtAuthenticationException("Not authenticated!", "Authorization");
         }
-        return new ResponseEntity<>(
-                userService.findUserByUsername(authentication.getName()),
-                HttpStatus.OK
+        return ResponseEntity.ok(
+                userService.findByUsername(authentication.getName())
         );
     }
 
@@ -118,11 +125,10 @@ public class UserController {
             throw new JwtAuthenticationException("Not authenticated!", "Authorization");
         }
 
-        User principal = userService.findUserByUsername(authentication.getName());
+        User principal = userService.findByUsername(authentication.getName());
 
-        return new ResponseEntity<>(
-                userService.update(userUpdate, principal.getId()),
-                HttpStatus.OK
+        return ResponseEntity.ok(
+                userService.update(userUpdate, principal.getId())
         );
     }
 

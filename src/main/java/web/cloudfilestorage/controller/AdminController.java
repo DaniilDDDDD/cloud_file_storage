@@ -5,15 +5,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import web.cloudfilestorage.dto.file.FileData;
 import web.cloudfilestorage.dto.file.FileView;
-import web.cloudfilestorage.dto.role.RoleUpdate;
+import web.cloudfilestorage.dto.role.RoleData;
 import web.cloudfilestorage.dto.user.UserUpdate;
-import web.cloudfilestorage.exceptions.JwtAuthenticationException;
 import web.cloudfilestorage.model.File;
 import web.cloudfilestorage.model.Role;
 import web.cloudfilestorage.model.User;
@@ -72,7 +70,7 @@ public class AdminController {
             @NotNull(message = "username must be provided as path variable")
             String username
     ) throws EntityNotFoundException {
-        User user = userService.findUserByUsername(username);
+        User user = userService.findByUsername(username);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
@@ -90,7 +88,7 @@ public class AdminController {
             UserUpdate userUpdate
     ) throws EntityNotFoundException {
 
-        User user = userService.findUserByUsername(username);
+        User user = userService.findByUsername(username);
 
         return new ResponseEntity<>(
                 userService.update(userUpdate, user.getId()),
@@ -132,6 +130,7 @@ public class AdminController {
         );
     }
 
+
     @Secured("ROLE_ADMIN")
     @GetMapping("/roles/{id}")
     @Operation(
@@ -167,6 +166,22 @@ public class AdminController {
         );
     }
 
+    @Secured("ROLE_ADMIN")
+    @PostMapping("/roles")
+    @Operation(
+            summary = "Create role",
+            description = "Create role with provided name"
+    )
+    public ResponseEntity<Role> createRole(
+            @Valid @RequestBody
+            RoleData roleData
+    ) {
+        return new ResponseEntity<>(
+                roleService.create(roleData),
+                HttpStatus.OK
+        );
+    }
+
     @Secured("ROlE_ADMIN")
     @PutMapping("/roles/{id}")
     @Operation(
@@ -179,7 +194,7 @@ public class AdminController {
             @Min(value = 1, message = "minimal value for id is 1")
             Long id,
             @RequestBody
-            RoleUpdate roleUpdate
+            RoleData roleUpdate
     ) throws EntityNotFoundException {
         return new ResponseEntity<>(
                 roleService.update(roleUpdate, id),
@@ -198,7 +213,7 @@ public class AdminController {
             @NotNull(message = "name must be provided")
             String name,
             @RequestBody
-            RoleUpdate roleUpdate
+            RoleData roleUpdate
     ) throws EntityNotFoundException {
         return new ResponseEntity<>(
                 roleService.update(roleUpdate, name),

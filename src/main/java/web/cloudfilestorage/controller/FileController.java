@@ -23,7 +23,6 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/files")
@@ -122,7 +121,7 @@ public class FileController {
         File file = fileService.fileById(id);
         User owner = file.getOwner();
 
-        if (owner != userService.findUserByUsername(authentication.getName())) {
+        if (owner != userService.findByUsername(authentication.getName())) {
             throw new AccessDeniedException(
                     "Permission denied!"
             );
@@ -162,7 +161,7 @@ public class FileController {
         File file = fileService.fileById(id);
         User owner = file.getOwner();
 
-        if (owner != userService.findUserByUsername(authentication.getName())) {
+        if (owner != userService.findByUsername(authentication.getName())) {
             throw new AccessDeniedException(
                     "Permission denied!"
             );

@@ -44,11 +44,19 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
+    public User findById(
+            Long id
+    ) throws EntityNotFoundException {
+        Optional<User> user = userRepository.findUserById(id);
+        if (user.isEmpty()) {
+            throw new EntityNotFoundException(
+                    "User with id " + id + " is not present in database!"
+            );
+        }
+        return user.get();
     }
 
-    public User findUserByUsername(
+    public User findByUsername(
             String username
     ) throws EntityNotFoundException {
 
@@ -61,11 +69,19 @@ public class UserService implements UserDetailsService {
         return user.get();
     }
 
-    public Optional<User> findUserByEmail(String email) {
-        return userRepository.findUserByEmail(email);
+    public User findByEmail(
+            String email
+    ) throws EntityNotFoundException {
+        Optional<User> user = userRepository.findUserByEmail(email);
+        if (user.isEmpty()) {
+            throw new EntityNotFoundException(
+                    "User with email " + email + " is not present in database!"
+            );
+        }
+        return user.get();
     }
 
-    public User register(UserRegister userData) throws EntityExistsException {
+    public User create(UserRegister userData) throws EntityExistsException {
 
         Optional<User> userByUsername = userRepository.findUserByUsername(userData.getUsername());
         Optional<User> userByEmail = userRepository.findUserByUsername(userData.getEmail());
@@ -90,7 +106,7 @@ public class UserService implements UserDetailsService {
 
 
     public User update(UserUpdate userUpdate, Long id) {
-        Optional<User> userData = userRepository.findById(id);
+        Optional<User> userData = userRepository.findUserById(id);
         if (userData.isEmpty()) {
             throw new EntityNotFoundException("User with id " + id + " is not present in the database");
         }
@@ -153,7 +169,7 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findUserByUsername(username);
         if (user.isEmpty()) {
-            throw new UsernameNotFoundException("User with username " + username + " is not present in the database!");
+            throw new UsernameNotFoundException("User with username " + username + " is not present in database!");
         }
         return user.get();
     }

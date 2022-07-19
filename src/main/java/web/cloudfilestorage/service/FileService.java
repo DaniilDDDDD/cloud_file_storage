@@ -1,5 +1,7 @@
 package web.cloudfilestorage.service;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class FileService{
     private final FileRepository fileRepository;
 
     @Value("${filesRoot}")
+    @Setter
     private String filesRoot;
 
     @Autowired
@@ -61,7 +64,7 @@ public class FileService{
         Optional<User> ownerData = userRepository.findUserByUsername(username);
         if (ownerData.isEmpty()) {
             throw new EntityNotFoundException(
-                    "User " + username + " is not present in the database!"
+                    "User " + username + " is not present in database!"
             );
         }
         User owner = ownerData.get();
@@ -69,12 +72,12 @@ public class FileService{
         String fileName = null;
         if (multipartFile != null) {
             fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-            String uploadDir = filesRoot + owner.getId();
+            String uploadDir = filesRoot + owner.getId() + "/";
             FileUtil.saveFile(uploadDir, fileName, multipartFile);
         }
 
         File file = new File(
-                fileName,
+                filesRoot + owner.getId() + "/" + fileName,
                 fileData.getDescription(),
                 owner
         );
@@ -91,9 +94,8 @@ public class FileService{
 
         if (multipartFile != null) {
             String newFileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-            String currentPath = filesRoot + file.getOwner().getId() + "/" + file.getFile();
-            FileUtil.updateFile(currentPath, newFileName, multipartFile);
-            file.setFile(newFileName);
+            FileUtil.updateFile(file.getFile(), newFileName, multipartFile);
+            file.setFile(filesRoot + file.getOwner().getId() + "/" + newFileName);
             return fileRepository.save(file);
         }
         return fileRepository.save(file);
@@ -102,8 +104,7 @@ public class FileService{
     public void delete (
             File file
     ) throws IOException, EntityNotFoundException {
-        FileUtil.deleteFile(
-                filesRoot + file.getOwner().getId() + "/" + file.getFile());
+        FileUtil.deleteFile(file.getFile());
         fileRepository.deleteById(file.getId());
     }
 

@@ -2,8 +2,10 @@ package web.cloudfilestorage.service;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import web.cloudfilestorage.dto.role.RoleUpdate;
+import web.cloudfilestorage.dto.role.RoleData;
 import web.cloudfilestorage.model.Role;
 import web.cloudfilestorage.repository.RoleRepository;
 
@@ -47,8 +49,18 @@ public class RoleService {
         return role.get();
     }
 
+    public Role create(
+            RoleData roleData
+    ) {
+        Role role = Role.builder()
+                .name(roleData.getName())
+                .users(List.of())
+                .build();
+        return roleRepository.save(role);
+    }
+
     public Role update(
-            RoleUpdate roleUpdate,
+            RoleData roleUpdate,
             Long id
     ) throws EntityNotFoundException {
         Optional<Role> roleData = roleRepository.findRoleById(id);
@@ -68,7 +80,7 @@ public class RoleService {
     }
 
     public Role update(
-            RoleUpdate roleUpdate,
+            RoleData roleUpdate,
             String name
     ) throws EntityNotFoundException {
         Optional<Role> roleData = roleRepository.findRoleByName(name);

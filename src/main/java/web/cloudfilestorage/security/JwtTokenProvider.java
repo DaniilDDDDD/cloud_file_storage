@@ -50,10 +50,11 @@ public class JwtTokenProvider {
     }
 
     // public String createToken(String username, List<Role> roles) {
-    public String createToken(String username, Collection<? extends GrantedAuthority> roles)
-        throws
-            JwtException
-    {
+    public String createToken(
+            String username,
+            Collection<? extends GrantedAuthority> roles
+    ) throws JwtException {
+
         Claims claims = Jwts.claims().setSubject(username);
         claims.put("roles", roles);
         Date now = new Date();
