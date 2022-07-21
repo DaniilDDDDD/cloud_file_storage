@@ -6,10 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.multipart.MultipartFile;
 import web.cloudfilestorage.dto.file.FileData;
 import web.cloudfilestorage.model.File;
@@ -23,20 +20,22 @@ import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
+import static web.cloudfilestorage.utils.TestFIleUtil.getMultipartFile;
 
 public class FileServiceTest {
 
     private final String testFilesRoot = "src/test/resources/test_files/";
 
-    private final FileRepository fileRepository = Mockito.mock(FileRepository.class);
+    @MockBean
+    private FileRepository fileRepository;
 
-    private final UserRepository userRepository = Mockito.mock(UserRepository.class);
+    @MockBean
+    private UserRepository userRepository;
 
     private FileService fileService;
 
@@ -274,19 +273,6 @@ public class FileServiceTest {
                 )
         );
 
-    }
-
-
-    private MultipartFile getMultipartFile(String pathToFile) {
-        Path path = Paths.get(pathToFile);
-        String name = String.valueOf(path.getFileName());
-        byte[] content = null;
-        try {
-            content = Files.readAllBytes(path);
-        } catch (IOException e) {
-        }
-        return new MockMultipartFile(name,
-                name, null, content);
     }
 
 }

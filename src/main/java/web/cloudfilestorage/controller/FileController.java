@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,17 +30,14 @@ public class FileController {
 
     private final UserService userService;
     private final FileService fileService;
-    private final AuthenticationManager authenticationManager;
 
     @Autowired
     public FileController(
             UserService userService,
-            FileService fileService,
-            AuthenticationManager authenticationManager
+            FileService fileService
     ) {
         this.userService = userService;
         this.fileService = fileService;
-        this.authenticationManager = authenticationManager;
     }
 
     @GetMapping("")

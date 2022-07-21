@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.mockito.Mockito;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import web.cloudfilestorage.dto.user.UserRegister;
@@ -24,9 +25,14 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 
 public class UserServiceTest {
-    private final UserRepository userRepository = Mockito.mock(UserRepository.class);
-    private final RoleRepository roleRepository = Mockito.mock(RoleRepository.class);
-    private final BCryptPasswordEncoder passwordEncoder = Mockito.mock(BCryptPasswordEncoder.class);
+
+    @MockBean
+    private UserRepository userRepository;
+
+    @MockBean
+    private RoleRepository roleRepository;
+    @MockBean
+    private BCryptPasswordEncoder passwordEncoder;
     private UserService userService;
 
     private final Role role_user = Role.builder().name("ROLE_USER").build();

@@ -68,7 +68,7 @@ public class UserController {
     public ResponseEntity<UserLogin> login(
             @Validated({UserLogin.OnRequest.class})
             @RequestBody
-                    UserLogin userLogin
+            UserLogin userLogin
     )
             throws
             JwtException,
@@ -98,7 +98,7 @@ public class UserController {
 
     @GetMapping("")
     @Operation(
-            summary = "Retrieve file",
+            summary = "Retrieve user",
             description = "Retrieve information about authenticated user"
     )
     public ResponseEntity<User> retrieve(

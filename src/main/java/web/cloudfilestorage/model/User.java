@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -103,13 +100,4 @@ public class User implements Serializable, UserDetails {
         return status == Status.ACTIVE;
     }
 
-    @JsonIgnore
-    public String getPassword() {
-        return password;
-    }
-
-    @JsonIgnore
-    public Status getStatus() {
-        return status;
-    }
 }

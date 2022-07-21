@@ -1,6 +1,7 @@
 package web.cloudfilestorage.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import javax.persistence.*;
@@ -29,11 +30,6 @@ public class File implements Serializable {
     @Column(name = "file")
     private String file;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JsonBackReference
-    @JoinColumn(name = "owner", nullable = false)
-    private User owner;
-
     public File(
             String file,
             String description,
@@ -44,6 +40,11 @@ public class File implements Serializable {
         this.owner = owner;
         this.uploadDate = LocalDateTime.now();
     }
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "owner", nullable = false)
+    @JsonBackReference
+    private User owner;
 
     public File() {
     }

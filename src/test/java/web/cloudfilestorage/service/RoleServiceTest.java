@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.mockito.Mockito;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import web.cloudfilestorage.dto.role.RoleData;
 import web.cloudfilestorage.model.Role;
 import web.cloudfilestorage.repository.RoleRepository;
@@ -16,7 +17,8 @@ import static org.assertj.core.api.Assertions.*;
 
 public class RoleServiceTest {
 
-    private final RoleRepository roleRepository = Mockito.mock(RoleRepository.class);
+    @MockBean
+    private RoleRepository roleRepository;
 
     private RoleService roleService;
 
