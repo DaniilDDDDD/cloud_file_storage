@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -37,6 +36,9 @@ public class UserControllerTest {
 
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -77,8 +79,6 @@ public class UserControllerTest {
             .password("qwerty1234")
             .firstName("user_updated_firstName")
             .lastName("user_updated_lastName")
-            .status(Status.ACTIVE)
-            .roles(List.of(role_user))
             .build();
 
 
@@ -117,12 +117,6 @@ public class UserControllerTest {
                 .password(user_2.getPassword())
                 .build();
 
-        authenticationUser1 = new UsernamePasswordAuthenticationToken(
-                user_1, "", user_1.getAuthorities()
-        );
-        authenticationUser2 = new UsernamePasswordAuthenticationToken(
-                user_2, "", user_2.getAuthorities()
-        );
 
         Mockito.when(userService.loadUserByUsername(user_1.getUsername()))
                 .thenReturn(user_1);
@@ -134,6 +128,19 @@ public class UserControllerTest {
         Mockito.when(userService.findByUsername(user_2.getUsername()))
                 .thenReturn(user_2);
 
+        Mockito.when(userService.create(newUserRegister)).thenReturn(
+                User.builder()
+                        .id(3L)
+                        .username(newUserRegister.getUsername())
+                        .email(newUserRegister.getEmail())
+                        .password(newUserRegister.getPassword() + "_encoded")
+                        .firstName(newUserRegister.getFirstName())
+                        .lastName(newUserRegister.getLastName())
+                        .status(Status.ACTIVE)
+                        .roles(List.of(role_user))
+                        .build()
+        );
+
         Mockito.when(userService.update(userUpdate, user_1.getId()))
                 .thenReturn(
                         User.builder()
@@ -143,8 +150,8 @@ public class UserControllerTest {
                                 .firstName(userUpdate.getFirstName())
                                 .lastName(userUpdate.getLastName())
                                 .password(userUpdate.getPassword())
-                                .status(userUpdate.getStatus())
-                                .roles(userUpdate.getRoles())
+                                .status(user_1.getStatus())
+                                .roles(user_1.getRoles())
                                 .build()
                 );
         Mockito.when(userService.update(userUpdate, user_2.getId()))
@@ -156,10 +163,19 @@ public class UserControllerTest {
                                 .firstName(userUpdate.getFirstName())
                                 .lastName(userUpdate.getLastName())
                                 .password(userUpdate.getPassword())
-                                .status(userUpdate.getStatus())
-                                .roles(userUpdate.getRoles())
+                                .status(user_2.getStatus())
+                                .roles(user_2.getRoles())
                                 .build()
                 );
+
+        authenticationUser1 = new UsernamePasswordAuthenticationToken(
+                user_1, "", user_1.getAuthorities()
+        );
+        authenticationUser2 = new UsernamePasswordAuthenticationToken(
+                user_2, "", user_2.getAuthorities()
+        );
+
+        Mockito.when(authenticationManager.authenticate(Mockito.any())).thenReturn(null);
 
         Mockito.when(jwtTokenProvider.createToken(
                         userLogin1.getLogin(),
@@ -198,20 +214,6 @@ public class UserControllerTest {
                             return token;
                         }
                 );
-
-
-        Mockito.when(userService.create(newUserRegister)).thenReturn(
-                User.builder()
-                        .id(3L)
-                        .username(newUserRegister.getUsername())
-                        .email(newUserRegister.getEmail())
-                        .password(newUserRegister.getPassword() + "_encoded")
-                        .firstName(newUserRegister.getFirstName())
-                        .lastName(newUserRegister.getLastName())
-                        .status(Status.ACTIVE)
-                        .roles(List.of(role_user))
-                        .build()
-        );
 
     }
 
@@ -331,7 +333,7 @@ public class UserControllerTest {
         ).andExpect(
                 jsonPath("$.lastName").value(userUpdate.getLastName())
         ).andExpect(
-                jsonPath("$.status").value(String.valueOf(userUpdate.getStatus()))
+                jsonPath("$.status").value(String.valueOf(user_1.getStatus()))
         ).andExpect(
                 jsonPath("$.roles").isArray()
         ).andExpect(
@@ -356,7 +358,7 @@ public class UserControllerTest {
         ).andExpect(
                 jsonPath("$.lastName").value(userUpdate.getLastName())
         ).andExpect(
-                jsonPath("$.status").value(String.valueOf(userUpdate.getStatus()))
+                jsonPath("$.status").value(String.valueOf(user_2.getStatus()))
         ).andExpect(
                 jsonPath("$.roles").isArray()
         ).andExpect(

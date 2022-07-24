@@ -27,6 +27,7 @@ public class FileService{
 
     @Value("${filesRoot}")
     @Setter
+    @Getter
     private String filesRoot;
 
     @Autowired
@@ -72,12 +73,12 @@ public class FileService{
         String fileName = null;
         if (multipartFile != null) {
             fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-            String uploadDir = filesRoot + owner.getId() + "/";
+            String uploadDir = getFilesRoot() + owner.getId() + "/";
             FileUtil.saveFile(uploadDir, fileName, multipartFile);
         }
 
         File file = new File(
-                filesRoot + owner.getId() + "/" + fileName,
+                getFilesRoot() + owner.getId() + "/" + fileName,
                 fileData.getDescription(),
                 owner
         );
@@ -95,7 +96,7 @@ public class FileService{
         if (multipartFile != null) {
             String newFileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
             FileUtil.updateFile(file.getFile(), newFileName, multipartFile);
-            file.setFile(filesRoot + file.getOwner().getId() + "/" + newFileName);
+            file.setFile(getFilesRoot() + file.getOwner().getId() + "/" + newFileName);
             return fileRepository.save(file);
         }
         return fileRepository.save(file);

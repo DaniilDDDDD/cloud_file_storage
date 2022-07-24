@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,7 +27,25 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class ErrorHandlerControllerAdvice {
 
-    @ExceptionHandler(ConstraintViolationException.class)
+    @ExceptionHandler({
+            MethodArgumentNotValidException.class
+    })
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ValidationErrorResponse onConstraintValidationException(
+            MethodArgumentNotValidException e
+    ) {
+        e.printStackTrace();
+        final Violation violation = new Violation(
+                e.getParameter().getParameterName(),
+                e.getMessage()
+        );
+        return new ValidationErrorResponse(violation);
+    }
+
+    @ExceptionHandler({
+            ConstraintViolationException.class
+    })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ValidationErrorResponse onConstraintValidationException(

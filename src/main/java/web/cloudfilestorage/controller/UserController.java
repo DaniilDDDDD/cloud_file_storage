@@ -118,7 +118,9 @@ public class UserController {
             description = "Update information about authenticated user"
     )
     public ResponseEntity<User> update(
-            @Valid @RequestBody UserUpdate userUpdate,
+            @Valid
+            @RequestBody
+            UserUpdate userUpdate,
             Authentication authentication
     ) throws JwtAuthenticationException {
         if (authentication == null) {

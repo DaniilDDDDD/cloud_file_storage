@@ -1,13 +1,10 @@
 package web.cloudfilestorage.service;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.mockito.Mockito;
-
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import web.cloudfilestorage.dto.user.UserRegister;
@@ -26,13 +23,12 @@ import static org.assertj.core.api.Assertions.*;
 
 public class UserServiceTest {
 
-    @MockBean
-    private UserRepository userRepository;
+    private final UserRepository userRepository = Mockito.mock(UserRepository.class);
 
-    @MockBean
-    private RoleRepository roleRepository;
-    @MockBean
-    private BCryptPasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository = Mockito.mock(RoleRepository.class);
+
+    private final BCryptPasswordEncoder passwordEncoder = Mockito.mock(BCryptPasswordEncoder.class);
+
     private UserService userService;
 
     private final Role role_user = Role.builder().name("ROLE_USER").build();
@@ -70,11 +66,6 @@ public class UserServiceTest {
         Mockito.when(roleRepository.findRoleByName("ROLE_ADMIN")).thenReturn(Optional.ofNullable(role_admin));
         Mockito.when(roleRepository.findRoleByName("ROLE_USER")).thenReturn(Optional.ofNullable(role_user));
     }
-
-    @AfterEach
-    void tearDown() {
-    }
-
     @Test
     void read() {
         assertThatNoException().isThrownBy(
@@ -135,16 +126,14 @@ public class UserServiceTest {
                 .password("1234qwerty")
                 .firstName("user_1_firstName_updated")
                 .lastName("user_1_lastName_updated")
-                .status(Status.ACTIVE)
-                .roles(List.of(role_user, role_admin))
                 .build();
 
         User userUpdated = userService.update(userUpdate, user.getId());
         assertThat(userUpdated.getUsername()).isEqualTo(userUpdate.getUsername());
         assertThat(userUpdated.getFirstName()).isEqualTo(userUpdate.getFirstName());
         assertThat(userUpdated.getLastName()).isEqualTo(userUpdate.getLastName());
-        assertThat(userUpdated.getStatus()).isEqualTo(userUpdate.getStatus());
-        assertThat(userUpdated.getRoles()).isEqualTo(userUpdate.getRoles());
+        assertThat(userUpdated.getStatus()).isEqualTo(user.getStatus());
+        assertThat(userUpdated.getRoles()).isEqualTo(user.getRoles());
         assertThat(
                 passwordEncoder.encode(userUpdated.getPassword())
         ).isEqualTo(

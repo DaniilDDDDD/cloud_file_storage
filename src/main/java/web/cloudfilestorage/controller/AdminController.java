@@ -2,9 +2,11 @@ package web.cloudfilestorage.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -86,12 +88,20 @@ public class AdminController {
             String username,
             @Valid @RequestBody
             UserUpdate userUpdate
-    ) throws EntityNotFoundException {
+    ) throws EntityNotFoundException, AccessDeniedException {
 
         User user = userService.findByUsername(username);
 
+        Role role_admin = roleService.retrieve("ROLE_ADMIN");
+
+        if (user.getRoles().contains(role_admin)) {
+            throw new AccessDeniedException(
+                    "Admin users can not update admin users!"
+            );
+        }
+
         return new ResponseEntity<>(
-                userService.update(userUpdate, user.getId()),
+                userService.update(userUpdate, user),
                 HttpStatus.OK
         );
     }
@@ -106,12 +116,22 @@ public class AdminController {
             @PathVariable(value = "username")
             @NotNull(message = "username must be provided as path variable")
             String username
-    ) throws EntityNotFoundException {
+    ) throws EntityNotFoundException, AccessDeniedException {
 
-        userService.delete(username);
+        User user = userService.findByUsername(username);
+
+        Role role_admin = roleService.retrieve("ROLE_ADMIN");
+
+        if (user.getRoles().contains(role_admin)) {
+            throw new AccessDeniedException(
+                    "Admin users can not update admin users!"
+            );
+        }
+
+        userService.delete(user);
 
         return new ResponseEntity<>(
-                "User " + username + "is deleted!",
+                "User " + username + " is deleted!",
                 HttpStatus.NO_CONTENT
         );
 
@@ -126,25 +146,6 @@ public class AdminController {
     public ResponseEntity<List<Role>> listRoles() {
         return new ResponseEntity<>(
                 roleService.list(),
-                HttpStatus.OK
-        );
-    }
-
-
-    @Secured("ROLE_ADMIN")
-    @GetMapping("/roles/{id}")
-    @Operation(
-            summary = "Retrieve role",
-            description = "Retrieve by id information about concrete role"
-    )
-    public ResponseEntity<Role> retrieveRole(
-            @PathVariable(value = "id")
-            @NotNull(message = "id must be provided as path variable")
-            @Min(value = 1, message = "minimal value for id is 1")
-            Long id
-    ) throws EntityNotFoundException {
-        return new ResponseEntity<>(
-                roleService.retrieve(id),
                 HttpStatus.OK
         );
     }
@@ -178,31 +179,11 @@ public class AdminController {
     ) {
         return new ResponseEntity<>(
                 roleService.create(roleData),
-                HttpStatus.OK
+                HttpStatus.CREATED
         );
     }
 
-    @Secured("ROlE_ADMIN")
-    @PutMapping("/roles/{id}")
-    @Operation(
-            summary = "Update role",
-            description = "Update information about concrete role"
-    )
-    public ResponseEntity<Role> updateRole(
-            @PathVariable(value = "id")
-            @NotNull(message = "id must be provided")
-            @Min(value = 1, message = "minimal value for id is 1")
-            Long id,
-            @RequestBody
-            RoleData roleUpdate
-    ) throws EntityNotFoundException {
-        return new ResponseEntity<>(
-                roleService.update(roleUpdate, id),
-                HttpStatus.OK
-        );
-    }
-
-    @Secured("ROlE_ADMIN")
+    @Secured("ROLE_ADMIN")
     @PutMapping("/roles/{name}")
     @Operation(
             summary = "Update role",
@@ -212,31 +193,12 @@ public class AdminController {
             @PathVariable(value = "name")
             @NotNull(message = "name must be provided")
             String name,
-            @RequestBody
+            @Valid @RequestBody
             RoleData roleUpdate
     ) throws EntityNotFoundException {
         return new ResponseEntity<>(
                 roleService.update(roleUpdate, name),
                 HttpStatus.OK
-        );
-    }
-
-    @Secured("ROLE_ADMIN")
-    @DeleteMapping("/roles/{id}")
-    @Operation(
-            summary = "Delete role",
-            description = "Delete about concrete role"
-    )
-    public ResponseEntity<String> deleteRole(
-            @PathVariable(value = "id")
-            @NotNull(message = "id must be provided")
-            @Min(value = 1, message = "minimal value for id is 1")
-            Long id
-    ) throws EntityNotFoundException {
-        roleService.delete(id);
-        return new ResponseEntity<>(
-                "Role with id " + id + " was deleted from database",
-                HttpStatus.NO_CONTENT
         );
     }
 
@@ -253,7 +215,7 @@ public class AdminController {
     ) throws EntityNotFoundException {
         roleService.delete(name);
         return new ResponseEntity<>(
-                "Role with name " + name + " was deleted from database",
+                "Role " + name + " was deleted from database",
                 HttpStatus.NO_CONTENT
         );
     }
@@ -330,7 +292,7 @@ public class AdminController {
             summary = "Delete file",
             description = "Delete file of any user"
     )
-    public void deleteFile(
+    public ResponseEntity<String> deleteFile(
             @PathVariable(value = "id")
             @NotNull(message = "id must be provided")
             @Min(value = 1, message = "minimal value for id is 1")
@@ -341,6 +303,11 @@ public class AdminController {
             EntityNotFoundException
     {
         fileService.delete(fileService.fileById(id));
+
+        return new ResponseEntity<>(
+                "File with id " + id + " is deleted",
+                HttpStatus.NO_CONTENT
+        );
     }
 
 

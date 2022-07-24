@@ -29,16 +29,6 @@ public class RoleService {
         return roleRepository.findAll();
     }
 
-    public Role retrieve(Long id) throws EntityNotFoundException {
-        Optional<Role> role = roleRepository.findRoleById(id);
-        if (role.isEmpty()) {
-            throw new EntityNotFoundException(
-                    "Role with id " + id + " is not present in database!"
-            );
-        }
-        return role.get();
-    }
-
     public Role retrieve(String name) throws EntityNotFoundException {
         Optional<Role> role = roleRepository.findRoleByName(name);
         if (role.isEmpty()) {
@@ -61,26 +51,6 @@ public class RoleService {
 
     public Role update(
             RoleData roleUpdate,
-            Long id
-    ) throws EntityNotFoundException {
-        Optional<Role> roleData = roleRepository.findRoleById(id);
-        if (roleData.isEmpty()) {
-            throw new EntityNotFoundException(
-                    "Role with id " + id + " is not present in database!"
-            );
-        }
-
-        Role role = roleData.get();
-        role.setName(
-                roleUpdate.getName() != null ?
-                        roleUpdate.getName() :
-                        role.getName()
-        );
-        return roleRepository.save(role);
-    }
-
-    public Role update(
-            RoleData roleUpdate,
             String name
     ) throws EntityNotFoundException {
         Optional<Role> roleData = roleRepository.findRoleByName(name);
@@ -97,17 +67,6 @@ public class RoleService {
                         role.getName()
         );
         return roleRepository.save(role);
-    }
-
-    @Transactional
-    public void delete(Long id) throws EntityNotFoundException {
-        Optional<Role> role = roleRepository.findRoleById(id);
-        if (role.isEmpty()) {
-            throw new EntityNotFoundException(
-                    "Role with id " + id + " is not present in database!"
-            );
-        }
-        roleRepository.delete(role.get());
     }
 
     @Transactional

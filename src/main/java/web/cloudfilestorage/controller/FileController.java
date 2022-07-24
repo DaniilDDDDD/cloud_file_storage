@@ -18,6 +18,7 @@ import web.cloudfilestorage.service.FileService;
 import web.cloudfilestorage.service.UserService;
 
 import javax.persistence.EntityNotFoundException;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -66,24 +67,22 @@ public class FileController {
     )
     public ResponseEntity<File> create(
             @RequestParam(value = "file")
-                    MultipartFile multipartFile,
+            MultipartFile multipartFile,
             FileData fileMetadata,
             Authentication authentication
     )
             throws
             JwtAuthenticationException,
-            IOException
-    {
+            IOException {
 
         if (authentication == null) {
             throw new JwtAuthenticationException("Not authenticated!", "Authorization");
         }
-
         return new ResponseEntity<>(
                 fileService.create(
-                    authentication.getName(),
-                    multipartFile,
-                    fileMetadata
+                        authentication.getName(),
+                        multipartFile,
+                        fileMetadata
                 ),
                 HttpStatus.CREATED
         );
@@ -94,13 +93,13 @@ public class FileController {
             summary = "Update file",
             description = "Update file owned by an authorized user"
     )
-    public ResponseEntity<File> update (
+    public ResponseEntity<File> update(
             @PathVariable(value = "id")
             @NotNull(message = "id must be provided as path variable")
             @Min(value = 1, message = "minimal value for id is 1")
-                    Long id,
+            Long id,
             @RequestParam(value = "file")
-                    MultipartFile multipartFile,
+            MultipartFile multipartFile,
             FileData fileMetadata,
             Authentication authentication
     )
@@ -108,8 +107,7 @@ public class FileController {
             JwtAuthenticationException,
             IOException,
             EntityNotFoundException,
-            AccessDeniedException
-    {
+            AccessDeniedException {
 
         if (authentication == null) {
             throw new JwtAuthenticationException("Not authenticated!", "Authorization");
@@ -138,19 +136,18 @@ public class FileController {
             summary = "Delete file",
             description = "Delete file owned by an authorized user"
     )
-    public ResponseEntity<String> delete (
+    public ResponseEntity<String> delete(
             @PathVariable(value = "id")
             @NotNull(message = "id must be provided as path variable")
             @Min(value = 1, message = "minimal value for id is 1")
-                    Long id,
+            Long id,
             Authentication authentication
     )
             throws
             JwtAuthenticationException,
             EntityNotFoundException,
             AccessDeniedException,
-            IOException
-    {
+            IOException {
         if (authentication == null) {
             throw new JwtAuthenticationException("Not authenticated!", "Authorization");
         }

@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Builder
 @AllArgsConstructor
 @Table(name = "\"user\"")
-@ToString(exclude = {"roles"})
+@ToString
 public class User implements Serializable, UserDetails {
 
     @Id

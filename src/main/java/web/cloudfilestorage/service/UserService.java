@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import web.cloudfilestorage.dto.user.UserRegister;
 import web.cloudfilestorage.dto.user.UserUpdate;
+import web.cloudfilestorage.dto.user.UserUpdateByAdmin;
 import web.cloudfilestorage.model.Role;
 import web.cloudfilestorage.model.Status;
 import web.cloudfilestorage.model.User;
@@ -105,7 +106,55 @@ public class UserService implements UserDetailsService {
     }
 
 
-    public User update(UserUpdate userUpdate, Long id) {
+    public User update(UserUpdate userUpdate, Long id) throws EntityNotFoundException {
+        Optional<User> userData = userRepository.findUserById(id);
+        if (userData.isEmpty()) {
+            throw new EntityNotFoundException("User with id " + id + " is not present in the database");
+        }
+
+        User user = userData.get();
+        user.setUsername(
+                userUpdate.getUsername() != null ?
+                        userUpdate.getUsername() : user.getUsername()
+        );
+        user.setFirstName(
+                userUpdate.getFirstName() != null ?
+                        userUpdate.getFirstName() : user.getFirstName()
+        );
+        user.setLastName(
+                userUpdate.getLastName() != null ?
+                        userUpdate.getLastName() : user.getLastName()
+        );
+        user.setPassword(
+                userUpdate.getPassword() != null ?
+                        passwordEncoder.encode(userUpdate.getPassword()) :
+                        user.getPassword()
+        );
+        return userRepository.save(user);
+    }
+
+    public User update(UserUpdate userUpdate, User user) {
+
+        user.setUsername(
+                userUpdate.getUsername() != null ?
+                        userUpdate.getUsername() : user.getUsername()
+        );
+        user.setFirstName(
+                userUpdate.getFirstName() != null ?
+                        userUpdate.getFirstName() : user.getFirstName()
+        );
+        user.setLastName(
+                userUpdate.getLastName() != null ?
+                        userUpdate.getLastName() : user.getLastName()
+        );
+        user.setPassword(
+                userUpdate.getPassword() != null ?
+                        passwordEncoder.encode(userUpdate.getPassword()) :
+                        user.getPassword()
+        );
+        return userRepository.save(user);
+    }
+    public User update(UserUpdateByAdmin userUpdate, Long id) throws EntityNotFoundException {
         Optional<User> userData = userRepository.findUserById(id);
         if (userData.isEmpty()) {
             throw new EntityNotFoundException("User with id " + id + " is not present in the database");
@@ -131,13 +180,41 @@ public class UserService implements UserDetailsService {
         );
         user.setStatus(
                 userUpdate.getStatus() != null ?
-                        userUpdate.getStatus() :
-                        user.getStatus()
+                        userUpdate.getStatus() : user.getStatus()
         );
         user.setRoles(
                 userUpdate.getRoles() != null ?
-                        userUpdate.getRoles() :
-                        user.getRoles()
+                        userUpdate.getRoles() : user.getRoles()
+        );
+        return userRepository.save(user);
+    }
+
+    public User update(UserUpdateByAdmin userUpdate, User user) {
+
+        user.setUsername(
+                userUpdate.getUsername() != null ?
+                        userUpdate.getUsername() : user.getUsername()
+        );
+        user.setFirstName(
+                userUpdate.getFirstName() != null ?
+                        userUpdate.getFirstName() : user.getFirstName()
+        );
+        user.setLastName(
+                userUpdate.getLastName() != null ?
+                        userUpdate.getLastName() : user.getLastName()
+        );
+        user.setPassword(
+                userUpdate.getPassword() != null ?
+                        passwordEncoder.encode(userUpdate.getPassword()) :
+                        user.getPassword()
+        );
+        user.setStatus(
+                userUpdate.getStatus() != null ?
+                        userUpdate.getStatus() : user.getStatus()
+        );
+        user.setRoles(
+                userUpdate.getRoles() != null ?
+                        userUpdate.getRoles() : user.getRoles()
         );
         return userRepository.save(user);
     }
@@ -163,6 +240,10 @@ public class UserService implements UserDetailsService {
             );
         }
         userRepository.deleteUserByUsername(username);
+    }
+    @Transactional
+    public void delete(User user) {
+        userRepository.delete(user);
     }
 
     @Override

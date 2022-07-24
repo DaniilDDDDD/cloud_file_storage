@@ -31,11 +31,9 @@ public class FileServiceTest {
 
     private final String testFilesRoot = "src/test/resources/test_files/";
 
-    @MockBean
-    private FileRepository fileRepository;
+    private final FileRepository fileRepository = Mockito.mock(FileRepository.class);
 
-    @MockBean
-    private UserRepository userRepository;
+    private final UserRepository userRepository = Mockito.mock(UserRepository.class);
 
     private FileService fileService;
 

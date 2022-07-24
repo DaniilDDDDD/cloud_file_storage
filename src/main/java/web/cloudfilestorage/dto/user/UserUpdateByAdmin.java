@@ -5,15 +5,11 @@ import lombok.Data;
 import web.cloudfilestorage.model.Role;
 import web.cloudfilestorage.model.Status;
 
-import javax.validation.constraints.Null;
 import java.util.List;
 
 @Data
 @Builder
-public class UserUpdate {
-    /*
-    * User can not change email linked to account
-    * */
+public class UserUpdateByAdmin {
 
     private String username;
 
@@ -22,5 +18,9 @@ public class UserUpdate {
     private String firstName;
 
     private String lastName;
+
+    private Status status;
+
+    private List<Role> roles;
 
 }

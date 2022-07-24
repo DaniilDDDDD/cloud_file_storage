@@ -22,4 +22,16 @@ public class TestFIleUtil {
                 name, null, content);
     }
 
+    public static MockMultipartFile getMultipartFile(String pathToFile, String name) {
+        Path path = Paths.get(pathToFile);
+        String originalFilename = String.valueOf(path.getFileName());
+        byte[] content = null;
+        try {
+            content = Files.readAllBytes(path);
+        } catch (IOException e) {
+        }
+        return new MockMultipartFile(name,
+                originalFilename, null, content);
+    }
+
 }
