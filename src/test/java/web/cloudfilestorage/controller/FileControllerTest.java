@@ -141,8 +141,8 @@ public class FileControllerTest {
 
         multipartFile = getMultipartFile("src/test/resources/test_files/test_image1.jpg", "file");
 
-        Mockito.when(fileService.fileById(file1.getId())).thenReturn(file1);
-        Mockito.when(fileService.fileById(file2.getId())).thenReturn(file2);
+        Mockito.when(fileService.findById(file1.getId())).thenReturn(file1);
+        Mockito.when(fileService.findById(file2.getId())).thenReturn(file2);
 
         Mockito.when(fileService.create(
                         ownerAuthentication.getName(),

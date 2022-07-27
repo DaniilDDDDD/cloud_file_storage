@@ -2,7 +2,6 @@ package web.cloudfilestorage.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -247,7 +246,7 @@ public class AdminController {
     ) throws EntityNotFoundException {
         return new ResponseEntity<>(
                 new FileView(
-                        fileService.fileById(id)
+                        fileService.findById(id)
                 ),
                 HttpStatus.OK
         );
@@ -272,7 +271,7 @@ public class AdminController {
             IOException,
             EntityNotFoundException {
 
-        File file = fileService.fileById(id);
+        File file = fileService.findById(id);
 
         return new ResponseEntity<>(
                 new FileView(
@@ -302,7 +301,7 @@ public class AdminController {
             IOException,
             EntityNotFoundException
     {
-        fileService.delete(fileService.fileById(id));
+        fileService.delete(fileService.findById(id));
 
         return new ResponseEntity<>(
                 "File with id " + id + " is deleted",

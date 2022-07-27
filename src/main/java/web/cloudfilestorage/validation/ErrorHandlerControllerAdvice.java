@@ -16,6 +16,7 @@ import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.ServletException;
 import javax.validation.ConstraintViolationException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
@@ -68,6 +69,7 @@ public class ErrorHandlerControllerAdvice {
             BadCredentialsException.class,
             EntityNotFoundException.class,
             EntityExistsException.class,
+            FileNotFoundException.class,
             ServletException.class
     })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -140,6 +142,21 @@ public class ErrorHandlerControllerAdvice {
         final Violation violation = new Violation(
                 "",
                 "Token generation error!"
+        );
+        return new ValidationErrorResponse(violation);
+    }
+
+    @ExceptionHandler({
+            AssertionError.class
+    })
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ValidationErrorResponse onAuthenticationException(
+            Exception e
+    ) {
+        final Violation violation = new Violation(
+                "",
+                "Internal server error!"
         );
         return new ValidationErrorResponse(violation);
     }

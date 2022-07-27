@@ -4,10 +4,13 @@ package web.cloudfilestorage.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import web.cloudfilestorage.dto.file.FileData;
@@ -18,9 +21,9 @@ import web.cloudfilestorage.service.FileService;
 import web.cloudfilestorage.service.UserService;
 
 import javax.persistence.EntityNotFoundException;
-import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -58,6 +61,58 @@ public class FileController {
                 fileService.allOwnerFiles(authentication.getName()),
                 HttpStatus.OK
         );
+    }
+
+    @GetMapping("/share")
+    @Operation(
+            summary = "Generate link",
+            description = "Generate link by which any user can download file"
+    )
+    public ResponseEntity<String> share(
+            @RequestParam(value = "id") long id
+    ) throws EntityNotFoundException {
+        return ResponseEntity.ok(fileService.generateLink(id));
+    }
+
+    @GetMapping("/download")
+    @Operation(
+            summary = "Download file",
+            description = "Download file by id"
+    )
+    public ResponseEntity<Resource> download(
+            @RequestParam(value = "id", required = false) Long id,
+            @RequestParam(value = "link", required = false) String link,
+            Authentication authentication
+    )
+            throws
+            EntityNotFoundException,
+            MissingRequestValueException,
+            JwtAuthenticationException,
+            FileNotFoundException
+    {
+        Resource resource = null;
+
+        if (link != null) {
+            resource = fileService.download(link);
+        } else {
+            if (id == null) {
+                throw new MissingRequestValueException("Id of link must be provided!");
+            }
+            if (authentication == null) {
+                throw new JwtAuthenticationException("Not authenticated!", "Authorization");
+            }
+            User principal = userService.findByUsername(authentication.getName());
+            File file = fileService.findById(id);
+            if (file.getOwner() == principal) {
+                resource = fileService.download(id);
+            }
+        }
+
+        assert resource != null;
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
     }
 
     @PostMapping("")
@@ -112,7 +167,7 @@ public class FileController {
         if (authentication == null) {
             throw new JwtAuthenticationException("Not authenticated!", "Authorization");
         }
-        File file = fileService.fileById(id);
+        File file = fileService.findById(id);
         User owner = file.getOwner();
 
         if (owner != userService.findByUsername(authentication.getName())) {
@@ -151,7 +206,7 @@ public class FileController {
         if (authentication == null) {
             throw new JwtAuthenticationException("Not authenticated!", "Authorization");
         }
-        File file = fileService.fileById(id);
+        File file = fileService.findById(id);
         User owner = file.getOwner();
 
         if (owner != userService.findByUsername(authentication.getName())) {

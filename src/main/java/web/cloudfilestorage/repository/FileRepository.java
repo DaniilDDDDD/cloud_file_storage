@@ -8,6 +8,10 @@ import java.util.Optional;
 
 public interface FileRepository extends JpaRepository<File, Long> {
     Optional<File> findFileById(Long id);
+
+    Optional<File> findFileByShareLink(String shareLink);
+
     Optional<File> findFileByFile(String file);
+
     List<File> findAllByOwner_Username(String username);
 }

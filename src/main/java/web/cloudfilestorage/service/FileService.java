@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,12 +17,16 @@ import web.cloudfilestorage.repository.UserRepository;
 import web.cloudfilestorage.utils.FileUtil;
 
 import javax.persistence.EntityNotFoundException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
-public class FileService{
+public class FileService {
 
     private final UserRepository userRepository;
     private final FileRepository fileRepository;
@@ -43,8 +49,12 @@ public class FileService{
         return fileRepository.findAll();
     }
 
-    public File fileById (long id) throws EntityNotFoundException {
-        Optional<File> file =  fileRepository.findFileById(id);
+    public List<File> allOwnerFiles(String username) {
+        return fileRepository.findAllByOwner_Username(username);
+    }
+
+    public File findById(long id) throws EntityNotFoundException {
+        Optional<File> file = fileRepository.findFileById(id);
         if (file.isEmpty()) {
             throw new EntityNotFoundException(
                     "File with id " + id + " is not present in database!"
@@ -53,11 +63,52 @@ public class FileService{
         return file.get();
     }
 
-    public List<File> allOwnerFiles (String username) {
-        return fileRepository.findAllByOwner_Username(username);
+    public File findByLink(String link) throws EntityNotFoundException {
+        Optional<File> file = fileRepository.findFileByShareLink(link);
+        if (file.isEmpty()) {
+            throw new EntityNotFoundException(
+                    "Link " + link + " is not valid!"
+            );
+        }
+        return file.get();
     }
 
-    public File create (
+    public String generateLink(long id) throws EntityNotFoundException {
+        File file = findById(id);
+        String link = UUID.randomUUID().toString();
+        file.setShareLink(link);
+        fileRepository.save(file);
+        return link;
+    }
+
+    public Resource download(long id)
+            throws EntityNotFoundException, FileNotFoundException {
+        File file = findById(id);
+        return getResource(file);
+    }
+
+    public Resource download(String link)
+            throws EntityNotFoundException, FileNotFoundException {
+        File file = findByLink(link);
+        return getResource(file);
+    }
+
+    private Resource getResource(File file) throws FileNotFoundException {
+        try {
+            Path filePath = Path.of(file.getFile());
+            Resource resource = new UrlResource(filePath.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            } else {
+                throw new FileNotFoundException(
+                        "Could not read file: " + file.getFile());
+            }
+        } catch (MalformedURLException e) {
+            throw new FileNotFoundException("Could not read file: " + file.getFile());
+        }
+    }
+
+    public File create(
             String username,
             MultipartFile multipartFile,
             FileData fileData
@@ -85,7 +136,7 @@ public class FileService{
         return fileRepository.save(file);
     }
 
-    public File update (
+    public File update(
             File file,
             MultipartFile multipartFile,
             FileData fileData
@@ -102,7 +153,7 @@ public class FileService{
         return fileRepository.save(file);
     }
 
-    public void delete (
+    public void delete(
             File file
     ) throws IOException, EntityNotFoundException {
         FileUtil.deleteFile(file.getFile());

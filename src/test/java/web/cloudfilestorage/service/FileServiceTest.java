@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.mockito.Mockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.multipart.MultipartFile;
 import web.cloudfilestorage.dto.file.FileData;
 import web.cloudfilestorage.model.File;
@@ -173,9 +172,9 @@ public class FileServiceTest {
         assertThat(files.get(0)).isIn(List.of(file_1, file_2));
         assertThat(files.get(1)).isIn(List.of(file_1, file_2));
 
-        File foundFile_1 = fileService.fileById(file_1.getId());
+        File foundFile_1 = fileService.findById(file_1.getId());
         assertThat(foundFile_1).isEqualTo(file_1);
-        File foundFile_2 = fileService.fileById(file_2.getId());
+        File foundFile_2 = fileService.findById(file_2.getId());
         assertThat(foundFile_2).isEqualTo(file_2);
 
         List<File> owner_1Files = fileService.allOwnerFiles(owner_1.getUsername());

@@ -8,7 +8,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
@@ -20,7 +19,6 @@ import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequ
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import web.cloudfilestorage.dto.file.FileData;
-import web.cloudfilestorage.dto.file.FileView;
 import web.cloudfilestorage.dto.role.RoleData;
 import web.cloudfilestorage.dto.user.UserUpdateByAdmin;
 import web.cloudfilestorage.exceptions.JwtAuthenticationException;
@@ -217,8 +215,8 @@ public class AdminControllerTest {
         Mockito.when(fileService.findAllFiles())
                 .thenReturn(List.of(file1, file2));
 
-        Mockito.when(fileService.fileById(file1.getId())).thenReturn(file1);
-        Mockito.when(fileService.fileById(file2.getId())).thenReturn(file2);
+        Mockito.when(fileService.findById(file1.getId())).thenReturn(file1);
+        Mockito.when(fileService.findById(file2.getId())).thenReturn(file2);
 
 
         Mockito.when(fileService.update(
