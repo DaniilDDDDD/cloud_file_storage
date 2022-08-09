@@ -74,12 +74,12 @@ public class FileController {
         return ResponseEntity.ok(fileService.generateLink(id));
     }
 
-    @GetMapping("/download")
+    @GetMapping("/resource")
     @Operation(
-            summary = "Download file",
-            description = "Download file by id"
+            summary = "Get resource",
+            description = "Download file of stream video retrieved via id or link"
     )
-    public ResponseEntity<Resource> download(
+    public ResponseEntity<Resource> resource(
             @RequestParam(value = "id", required = false) Long id,
             @RequestParam(value = "link", required = false) String link,
             Authentication authentication

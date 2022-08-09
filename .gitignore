@@ -38,3 +38,8 @@ out/
 
 /src/main/resources/application.properties
 /src/main/resources/media/
+/src/main/resources/application-prod.properties
+*.env
+
+/deployment/kubernates/backend/backend-config.yaml
+/deployment/kubernates/database/postgres-config.yaml
