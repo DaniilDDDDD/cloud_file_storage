@@ -1,7 +1,6 @@
 version: '3.3'
 
 services:
-
   db:
     image: postgres:14.4-alpine
     volumes:
@@ -10,22 +9,22 @@ services:
     env_file:
       - .env
   backend:
-    #    image: daniilpanyushin/cloud_file_storage:0.1
-    build:
-      context: ../..
-      dockerfile: Dockerfile
+    image: daniilpanyushin/cloud_file_storage:0.1
+#    build:
+#      context: ../..
+#      dockerfile: Dockerfile
     restart: always
     ports:
       - "8080:8080"
     env_file:
       - .env
-#    volumes:
+    volumes:
 #      - static_files:/code/static/
-#      - media_files:/code/media/
+      - media_files:/code/media/
     depends_on:
       - db
 
 volumes:
   postgres_data:
 #  static_files:
-#  media_files:
+  media_files:

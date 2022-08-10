@@ -21,3 +21,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: backend-config
+          volumeMounts:
+            - mountPath: /src/main/resources
+              name: backend-media
+      volumes:
+        - name: backend-media
+          persistentVolumeClaim:
+            claimName: backend-persistent-volume-claim
