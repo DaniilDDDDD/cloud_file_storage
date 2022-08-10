@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: postgres-persistent-volume
+  name: backend-persistent-volume
   labels:
     type: local
-    app: postgres
+    app: backend
 spec:
   storageClassName: manual
   capacity:
@@ -12,14 +12,14 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: "/data"
+    path: "/mnt/data"
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: postgres-persistent-volume-claim
+  name: backend-persistent-volume-claim
   labels:
-    app: postgres
+    app: backend
 spec:
   storageClassName: manual
   accessModes:
